@@ -135,33 +135,41 @@ auth.onAuthStateChanged(user => {
   }
 });
 
-// -- Resume prompt
 function showResumePrompt() {
-  goTo("splash");
-  var banner  = document.getElementById("resume-banner");
-  var mainBtn = document.getElementById("btn-enter");
+  goTo('splash');
+  var banner  = document.getElementById('resume-banner');
+  var mainBtn = document.getElementById('btn-enter');
   if (banner) {
-    banner.classList.remove("hidden");
-    document.getElementById("resume-info").textContent =
+    banner.classList.remove('hidden');
+    document.getElementById('resume-info').textContent =
       state.topic.charAt(0).toUpperCase() + state.topic.slice(1) +
-      " — Question " + (state.idx + 1) + " of " + TOTAL_QS + " | Score: " + state.score;
+      ' - Question ' + (state.idx + 1) + ' of ' + TOTAL_QS + ' | Score: ' + state.score;
   }
-  // hide the normal Start Quiz button when resume banner is visible
-  if (mainBtn) mainBtn.style.display = "none";
+  if (mainBtn) mainBtn.style.display = 'none';
 }
 
 $("btn-logout").addEventListener("click", () => { clearSession(); logoutUser(); });
 
 // -- Splash
-$("btn-enter").addEventListener("click", () => {
+$('btn-enter').addEventListener('click', () => {
   clearSession();
-  hide("resume-banner");
-  goTo("topics");
+  hide('resume-banner');
+  goTo('topics');
 });
 
-document.getElementById("btn-resume") && document.getElementById("btn-resume").addEventListener("click", () => {
-  hide("resume-banner");
-  goTo("quiz");
+var btnStartNew = document.getElementById('btn-start-new');
+if (btnStartNew) btnStartNew.addEventListener('click', () => {
+  clearSession();
+  hide('resume-banner');
+  document.getElementById('btn-enter').style.display = '';
+  goTo('topics');
+});
+
+var btnResume = document.getElementById('btn-resume');
+if (btnResume) btnResume.addEventListener('click', () => {
+  hide('resume-banner');
+  document.getElementById('btn-enter').style.display = '';
+  goTo('quiz');
   renderQuestion();
 });
 
