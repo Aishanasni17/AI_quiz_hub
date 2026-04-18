@@ -19,6 +19,23 @@ const state = {
 const TOTAL_QS   = 10;
 const TIME_LIMIT = 15;
 const BASE_PTS   = 10;
+const SAVE_KEY   = "quizhub_session";
+
+// -- Save quiz state to sessionStorage
+function saveSession() {
+  sessionStorage.setItem(SAVE_KEY, JSON.stringify({
+    player : state.player,
+    topic  : state.topic,
+    qs     : state.qs,
+    idx    : state.idx,
+    score  : state.score
+  }));
+}
+
+// -- Clear saved session
+function clearSession() {
+  sessionStorage.removeItem(SAVE_KEY);
+}
 
 // -- Screen router
 function goTo(screen) {
@@ -90,19 +107,63 @@ auth.onAuthStateChanged(user => {
     $("btn-logout").classList.remove("hidden");
     $("btn-login").textContent = "Login";
     $("btn-register").textContent = "Create Account";
+
+    // -- Check for saved quiz session and resume
+    const saved = sessionStorage.getItem(SAVE_KEY);
+    if (saved) {
+      try {
+        const s = JSON.parse(saved);
+        // only resume if same player
+        if (s.player === state.player && s.qs && s.qs.length) {
+          state.topic  = s.topic;
+          state.qs     = s.qs;
+          state.idx    = s.idx;
+          state.score  = s.score;
+          state.locked = false;
+          showResumePrompt();
+          return;
+        }
+      } catch(e) { clearSession(); }
+    }
     goTo("splash");
   } else {
     state.player = "";
     $("nav-user").classList.add("hidden");
     $("btn-logout").classList.add("hidden");
+    clearSession();
     goTo("auth");
   }
 });
 
-$("btn-logout").addEventListener("click", () => logoutUser());
+// -- Resume prompt
+function showResumePrompt() {
+  goTo("splash");
+  var banner  = document.getElementById("resume-banner");
+  var mainBtn = document.getElementById("btn-enter");
+  if (banner) {
+    banner.classList.remove("hidden");
+    document.getElementById("resume-info").textContent =
+      state.topic.charAt(0).toUpperCase() + state.topic.slice(1) +
+      " — Question " + (state.idx + 1) + " of " + TOTAL_QS + " | Score: " + state.score;
+  }
+  // hide the normal Start Quiz button when resume banner is visible
+  if (mainBtn) mainBtn.style.display = "none";
+}
+
+$("btn-logout").addEventListener("click", () => { clearSession(); logoutUser(); });
 
 // -- Splash
-$("btn-enter").addEventListener("click", () => goTo("topics"));
+$("btn-enter").addEventListener("click", () => {
+  clearSession();
+  hide("resume-banner");
+  goTo("topics");
+});
+
+document.getElementById("btn-resume") && document.getElementById("btn-resume").addEventListener("click", () => {
+  hide("resume-banner");
+  goTo("quiz");
+  renderQuestion();
+});
 
 // -- Topic selection
 document.querySelectorAll(".topic-card").forEach(card => {
@@ -120,6 +181,7 @@ function beginQuiz() {
   state.idx    = 0;
   state.score  = 0;
   state.locked = false;
+  saveSession();
   goTo("quiz");
   renderQuestion();
 }
@@ -127,6 +189,7 @@ function beginQuiz() {
 function renderQuestion() {
   const q = state.qs[state.idx];
   state.locked = false;
+  saveSession();
 
   $("q-topic").textContent   = state.topic.charAt(0).toUpperCase() + state.topic.slice(1);
   $("q-counter").textContent = (state.idx + 1) + " / " + TOTAL_QS;
@@ -221,6 +284,7 @@ function advance() {
 // -- Results
 function finishQuiz() {
   clearInterval(state.timer);
+  clearSession();
   goTo("result");
 
   const maxScore = TOTAL_QS * (BASE_PTS + TIME_LIMIT);
@@ -264,7 +328,7 @@ function finishQuiz() {
       ) + 1;
       if (rankEl) {
         rankEl.textContent = rank > 0
-          ? "Your Rank: #" + rank + " out of " + all.length + " players"
+          ? "🏅 Your Rank: #" + rank + " out of " + all.length + " players"
           : "Score saved!";
       }
     });
@@ -273,7 +337,7 @@ function finishQuiz() {
   });
 }
 
-$("btn-play-again").addEventListener("click", () => goTo("topics"));
+$("btn-play-again").addEventListener("click", () => { clearSession(); goTo("topics"); });
 $("btn-view-lb").addEventListener("click", openLeaderboard);
 $("btn-home-res").addEventListener("click", () => goTo("splash"));
 

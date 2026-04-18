@@ -79,14 +79,27 @@
       <span class="splash-emoji">🧠</span>
       <h1>QuizHub</h1>
       <p>Welcome back, <strong id="welcome-name"></strong>!<br/>Pick a topic and race the clock.</p>
-      <div class="feature-pills">
+
+      <!-- Resume banner (shown only when a session exists) -->
+      <div id="resume-banner" class="resume-banner hidden">
+        <p class="resume-title">You have an unfinished quiz!</p>
+        <p id="resume-info" class="resume-info"></p>
+        <div class="resume-btns">
+          <button class="btn btn-primary" id="btn-resume">Resume Quiz</button>
+          <button class="btn btn-ghost" id="btn-enter">Start New</button>
+        </div>
+      </div>
+
+      <!-- Normal start button (hidden when resume banner is shown) -->
+      <button class="btn btn-primary" id="btn-enter" style="margin-top:28px">Start Quiz</button>
+
+      <div class="feature-pills" style="margin-top:20px">
         <span class="pill">📚 5 Topics</span>
         <span class="pill">⏱️ 15s Timer</span>
         <span class="pill">⚡ Speed Bonus</span>
         <span class="pill">🏆 Live Leaderboard</span>
         <span class="pill">🔥 Firebase Realtime</span>
       </div>
-      <button class="btn btn-primary" id="btn-enter" style="margin-top:28px">Start Quiz →</button>
     </div>
   </div>
 

@@ -597,6 +597,30 @@ tr.my-row:not(.rank-1):not(.rank-2):not(.rank-3) td { color: var(--violet); }
   margin-bottom: 24px;
 }
 
+/* ── Resume Banner ─────────────────────────────────────────── */
+.resume-banner {
+  background: rgba(99,102,241,.15);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+.resume-title {
+  font-weight: 700;
+  color: var(--violet);
+  margin-bottom: 6px;
+}
+.resume-info {
+  font-size: .88rem;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.resume-btns {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 500px) {
   .splash-card { padding: 36px 20px; }
