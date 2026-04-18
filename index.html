@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuizHub – AI-Powered Quiz Platform</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Favicon via SVG data URI -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>" />
+</head>
+<body>
+
+  <!-- ══════════════ NAV ══════════════ -->
+  <nav>
+    <span class="nav-logo">🧠 QuizHub</span>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span class="nav-user hidden" id="nav-user"></span>
+      <button class="btn btn-outline" id="btn-lb-nav">🏆 Leaderboard</button>
+      <button class="btn btn-ghost hidden" id="btn-logout">Logout</button>
+    </div>
+  </nav>
+
+  <!-- ══════════════ SCREEN: AUTH (Login / Register) ══════════════ -->
+  <div id="screen-auth" class="screen">
+    <div class="auth-card">
+      <span class="splash-emoji">🧠</span>
+      <h1>QuizHub</h1>
+      <p>Sign in to compete on the live leaderboard</p>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login">Login</button>
+        <button class="auth-tab" id="tab-register">Register</button>
+      </div>
+
+      <!-- Login Form -->
+      <div id="form-login">
+        <div class="field">
+          <label>Email</label>
+          <input id="login-email" type="email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input id="login-password" type="password" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <div id="login-error" class="auth-error hidden"></div>
+        <button class="btn btn-primary w-full" id="btn-login">Login →</button>
+      </div>
+
+      <!-- Register Form -->
+      <div id="form-register" class="hidden">
+        <div class="field">
+          <label>Display Name</label>
+          <input id="reg-name" type="text" placeholder="Your name" maxlength="24" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input id="reg-email" type="email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input id="reg-password" type="password" placeholder="Min 6 characters" autocomplete="new-password" />
+        </div>
+        <div id="reg-error" class="auth-error hidden"></div>
+        <button class="btn btn-primary w-full" id="btn-register">Create Account →</button>
+      </div>
+
+      <div class="feature-pills" style="margin-top:24px">
+        <span class="pill">📚 5 Topics</span>
+        <span class="pill">⏱️ 15s Timer</span>
+        <span class="pill">⚡ Speed Bonus</span>
+        <span class="pill">🏆 Live Leaderboard</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ SCREEN: SPLASH ══════════════ -->
+  <div id="screen-splash" class="screen hidden">
+    <div class="splash-card">
+      <span class="splash-emoji">🧠</span>
+      <h1>QuizHub</h1>
+      <p>Welcome back, <strong id="welcome-name"></strong>!<br/>Pick a topic and race the clock.</p>
+      <div class="feature-pills">
+        <span class="pill">📚 5 Topics</span>
+        <span class="pill">⏱️ 15s Timer</span>
+        <span class="pill">⚡ Speed Bonus</span>
+        <span class="pill">🏆 Live Leaderboard</span>
+        <span class="pill">🔥 Firebase Realtime</span>
+      </div>
+      <button class="btn btn-primary" id="btn-enter" style="margin-top:28px">Start Quiz →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════ SCREEN: TOPICS ══════════════ -->
+  <div id="screen-topics" class="screen hidden">
+    <h2>Choose a Topic</h2>
+    <p>Pick a category to start your 10-question quiz</p>
+
+    <div class="topics-grid">
+      <div class="topic-card" data-topic="javascript">
+        <span class="t-icon">⚡</span>
+        <h3>JavaScript</h3>
+        <p>ES6+, closures, async</p>
+      </div>
+      <div class="topic-card" data-topic="python">
+        <span class="t-icon">🐍</span>
+        <h3>Python</h3>
+        <p>OOP, data structures</p>
+      </div>
+      <div class="topic-card" data-topic="science">
+        <span class="t-icon">🔬</span>
+        <h3>Science</h3>
+        <p>Physics, chemistry, bio</p>
+      </div>
+      <div class="topic-card" data-topic="history">
+        <span class="t-icon">🏛️</span>
+        <h3>History</h3>
+        <p>World events & figures</p>
+      </div>
+      <div class="topic-card" data-topic="math">
+        <span class="t-icon">📐</span>
+        <h3>Math</h3>
+        <p>Algebra, calculus, logic</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ SCREEN: QUIZ ══════════════ -->
+  <div id="screen-quiz" class="screen hidden">
+    <div class="quiz-wrap">
+
+      <!-- Top bar: meta chips + timer -->
+      <div class="quiz-topbar">
+        <div class="meta-chips">
+          <span class="chip" id="q-topic"></span>
+          <span class="chip" id="q-counter"></span>
+          <span class="chip" id="q-score">⭐ 0</span>
+        </div>
+        <div class="timer-wrap">
+          <div id="timer-arc">
+            <div class="timer-inner">
+              <span id="timer-num">15</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="progress-track">
+        <div id="prog-fill" style="width:0%"></div>
+      </div>
+
+      <!-- Question -->
+      <div class="q-card" id="q-text"></div>
+
+      <!-- Options -->
+      <div id="options-grid"></div>
+
+      <!-- Feedback -->
+      <div id="feedback-bar" class="feedback-bar hidden"></div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════ SCREEN: RESULT ══════════════ -->
+  <div id="screen-result" class="screen hidden">
+    <div class="result-card">
+      <span id="res-icon"></span>
+      <p id="res-msg"></p>
+      <p class="res-meta">Player: <strong id="res-name"></strong></p>
+      <p class="res-meta">Topic: <strong id="res-topic"></strong></p>
+      <div class="score-big" id="res-score"></div>
+      <p id="res-pct"></p>
+      <p id="res-rank" class="res-rank"></p>
+      <div class="result-actions">
+        <button class="btn btn-primary"  id="btn-play-again">🔄 Play Again</button>
+        <button class="btn btn-outline"  id="btn-view-lb">🏆 Leaderboard</button>
+        <button class="btn btn-ghost"    id="btn-home-res">🏠 Home</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ SCREEN: LEADERBOARD ══════════════ -->
+  <div id="screen-leaderboard" class="screen hidden">
+    <h2>🏆 Leaderboard</h2>
+
+    <div class="lb-wrap">
+      <div class="lb-controls">
+        <label for="lb-topic-filter">Filter:</label>
+        <select id="lb-topic-filter">
+          <option value="all">All Topics</option>
+          <option value="javascript">JavaScript</option>
+          <option value="python">Python</option>
+          <option value="science">Science</option>
+          <option value="history">History</option>
+          <option value="math">Math</option>
+        </select>
+      </div>
+
+      <div class="lb-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Player</th>
+              <th>Topic</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody id="lb-tbody">
+            <tr><td colspan="4" class="lb-loading">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lb-footer">
+        <span class="live-badge">
+          <span class="live-dot"></span>
+          Live updates
+        </span>
+        <button class="btn btn-ghost" id="btn-home-lb">🏠 Home</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ SCRIPTS ══════════════ -->
+  <!-- Firebase SDK (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <script src="js/firebase.js"></script>
+  <script src="js/questions.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
